@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+
+<launch>
+  <arg name="world" default="empty"/> 
+  <arg name="paused" default="false"/>
+  <arg name="use_sim_time" default="true"/>
+  <arg name="gui" default="true"/>
+  <arg name="headless" default="false"/>
+  <arg name="debug" default="false"/>
+
+    
+  <arg name="world_file" default="$(find four_wheel_steering_controller)/test/worlds/khaled"/>
+  <!-- Start gazebo world -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="debug" value="$(arg debug)" />
+    <arg name="world_name" value="$(arg world_file)"/>
+    <arg name="gui" value="$(arg gui)" />
+    <arg name="paused" value="$(arg paused)"/>
+    <arg name="use_sim_time" value="$(arg use_sim_time)"/>
+    <arg name="headless" value="$(arg headless)"/>
+    <arg name="verbose" value="false"/>
+  </include>
+  <!-- OR -->
+  <!-- Start four_wheel_steering -->
+  <!--node name="four_wheel_steering"
+      pkg="four_wheel_steering_controller"
+      type="four_wheel_steering" output="screen"/-->
+
+  <!-- load robot -->
+  <param name="robot_description"
+         command="$(find xacro)/xacro '$(find four_wheel_steering_controller)/test/urdf/four_wheel_steering.urdf.xacro'" />
+
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+
+  <!-- Load controller config -->
+  <rosparam command="load" file="$(find four_wheel_steering_controller)/test/config/four_wheel_steering_controller_4ws_cmd.yaml" />
+
+  <!-- push robot_description to factory and spawn robot in gazebo -->
+  <node name="spawn_four_wheel_steering" pkg="gazebo_ros" type="spawn_model"
+        args="-urdf -param robot_description -model four_wheel_steering -z 0.5" respawn="false" output="screen" />
+
+  <!-- Spawn controller -->
+  <node name="controller_spawner"
+        pkg="controller_manager" type="spawner" output="screen"
+        args="robot_joint_publisher four_wheel_steering_controller --shutdown-timeout 3"/>
+
+    <remap from='joy' to='joy0'/>
+    <node pkg="joy" type="joy_node" name="joy_node0">
+      <param name="dev" value="/dev/input/js0" />
+      <param name="deadzone" value="0.3" />
+      <param name="autorepeat_rate" value="20" />
+    </node>
+
+  <node pkg="teleop_twist_joy" type="teleop_node" name="teleop_twist_joy">
+    <remap from="cmd_vel" to="/four_wheel_steering_controller/cmd_vel"/>
+  </node>
+
+  <!--node pkg="teleop_twist_keyboard" type="teleop_node" name="teleop_twist_keyboard">
+    <remap from="cmd_vel" to="/four_wheel_steering_controller/cmd_vel"/>
+  </node-->
+  
+  <!--include file="$(find fourth_robot_control)/launch/robot_control.launch"/-->
+  <!--include file="$(find commander)/launch/commander.launch"/-->
+  <node name="rviz" pkg="rviz" type="rviz" /> 
+</launch>

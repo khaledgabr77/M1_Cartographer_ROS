@@ -1,0 +1,202 @@
+<?xml version="1.0"?>
+<robot>
+  <gazebo reference="FR_WideCamera_Link">
+
+    <sensor type="camera" name="camera1">
+      <update_rate>30.0</update_rate>
+      <camera name="head">
+        <horizontal_fov>2.79253</horizontal_fov>
+        <image>
+          <width>3840</width>
+          <height>2160</height>
+          <format>R8G8B8</format>
+        </image>
+        <clip>
+          <near>0.02</near>
+          <far>300</far>
+        </clip>
+      </camera>
+      <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+        <alwaysOn>true</alwaysOn>
+        <updateRate>0.0</updateRate>
+        <cameraName>micropolis/camera1</cameraName>
+        <imageTopicName>image_raw1</imageTopicName>
+        <cameraInfoTopicName>camera_info1</cameraInfoTopicName>
+        <frameName>FR_WideCamera_Link</frameName>
+        <hackBaseline>0.07</hackBaseline>
+        <distortionK1>0.0</distortionK1>
+        <distortionK2>0.0</distortionK2>
+        <distortionK3>0.0</distortionK3>
+        <distortionT1>0.0</distortionT1>
+        <distortionT2>0.0</distortionT2>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+  <gazebo reference="FL_WideCamera_Link">
+
+    <sensor type="camera" name="camera2">
+      <update_rate>30.0</update_rate>
+      <camera name="head">
+        <horizontal_fov>2.79253</horizontal_fov>
+        <image>
+          <width>3840</width>
+          <height>2160</height>
+          <format>R8G8B8</format>
+        </image>
+        <clip>
+          <near>0.02</near>
+          <far>300</far>
+        </clip>
+      </camera>
+      <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+        <alwaysOn>true</alwaysOn>
+        <updateRate>0.0</updateRate>
+        <cameraName>micropolis/camera2</cameraName>
+        <imageTopicName>image_raw2</imageTopicName>
+        <cameraInfoTopicName>camera_info2</cameraInfoTopicName>
+        <frameName>FL_WideCamera_Link</frameName>
+        <hackBaseline>0.07</hackBaseline>
+        <distortionK1>0.0</distortionK1>
+        <distortionK2>0.0</distortionK2>
+        <distortionK3>0.0</distortionK3>
+        <distortionT1>0.0</distortionT1>
+        <distortionT2>0.0</distortionT2>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+  <gazebo reference="FC_WideCamera_Link">
+
+    <sensor type="camera" name="camera3">
+      <update_rate>30.0</update_rate>
+      <camera name="head">
+        <horizontal_fov>2.79253</horizontal_fov>
+        <image>
+          <width>3840</width>
+          <height>2160</height>
+          <format>R8G8B8</format>
+        </image>
+        <clip>
+          <near>0.02</near>
+          <far>300</far>
+        </clip>
+      </camera>
+      <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+        <alwaysOn>true</alwaysOn>
+        <updateRate>0.0</updateRate>
+        <cameraName>micropolis/camera3</cameraName>
+        <imageTopicName>image_raw3</imageTopicName>
+        <cameraInfoTopicName>camera_info3</cameraInfoTopicName>
+        <frameName>FC_WideCamera_Link</frameName>
+        <hackBaseline>0.07</hackBaseline>
+        <distortionK1>0.0</distortionK1>
+        <distortionK2>0.0</distortionK2>
+        <distortionK3>0.0</distortionK3>
+        <distortionT1>0.0</distortionT1>
+        <distortionT2>0.0</distortionT2>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+  <gazebo reference="RR_WideCamera_Link">
+
+    <sensor type="camera" name="camera4">
+      <update_rate>30.0</update_rate>
+      <camera name="head">
+        <horizontal_fov>2.79253</horizontal_fov>
+        <image>
+          <width>3840</width>
+          <height>2160</height>
+          <format>R8G8B8</format>
+        </image>
+        <clip>
+          <near>0.02</near>
+          <far>300</far>
+        </clip>
+      </camera>
+      <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+        <alwaysOn>true</alwaysOn>
+        <updateRate>0.0</updateRate>
+        <cameraName>micropolis/camera4</cameraName>
+        <imageTopicName>image_raw4</imageTopicName>
+        <cameraInfoTopicName>camera_info4</cameraInfoTopicName>
+        <frameName>RR_WideCamera_Link</frameName>
+        <hackBaseline>0.07</hackBaseline>
+        <distortionK1>0.0</distortionK1>
+        <distortionK2>0.0</distortionK2>
+        <distortionK3>0.0</distortionK3>
+        <distortionT1>0.0</distortionT1>
+        <distortionT2>0.0</distortionT2>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+  <gazebo reference="RL_WideCamera_Link">
+
+    <sensor type="camera" name="camera5">
+      <update_rate>30.0</update_rate>
+      <camera name="head">
+        <horizontal_fov>2.79253</horizontal_fov>
+        <image>
+          <width>3840</width>
+          <height>2160</height>
+          <format>R8G8B8</format>
+        </image>
+        <clip>
+          <near>0.02</near>
+          <far>300</far>
+        </clip>
+      </camera>
+      <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+        <alwaysOn>true</alwaysOn>
+        <updateRate>0.0</updateRate>
+        <cameraName>micropolis/camera5</cameraName>
+        <imageTopicName>image_raw5</imageTopicName>
+        <cameraInfoTopicName>camera_info5</cameraInfoTopicName>
+        <frameName>RL_WideCamera_Link</frameName>
+        <hackBaseline>0.07</hackBaseline>
+        <distortionK1>0.0</distortionK1>
+        <distortionK2>0.0</distortionK2>
+        <distortionK3>0.0</distortionK3>
+        <distortionT1>0.0</distortionT1>
+        <distortionT2>0.0</distortionT2>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+  <gazebo reference="RC_WideCamera_Link">
+
+    <sensor type="camera" name="camera6">
+      <update_rate>30.0</update_rate>
+      <camera name="head">
+        <horizontal_fov>2.79253</horizontal_fov>
+        <image>
+          <width>3840</width>
+          <height>2160</height>
+          <format>R8G8B8</format>
+        </image>
+        <clip>
+          <near>0.02</near>
+          <far>300</far>
+        </clip>
+      </camera>
+      <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+        <alwaysOn>true</alwaysOn>
+        <updateRate>0.0</updateRate>
+        <cameraName>micropolis/camera6</cameraName>
+        <imageTopicName>image_raw6</imageTopicName>
+        <cameraInfoTopicName>camera_info6</cameraInfoTopicName>
+        <frameName>RC_WideCamera_Link</frameName>
+        <hackBaseline>0.07</hackBaseline>
+        <distortionK1>0.0</distortionK1>
+        <distortionK2>0.0</distortionK2>
+        <distortionK3>0.0</distortionK3>
+        <distortionT1>0.0</distortionT1>
+        <distortionT2>0.0</distortionT2>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+
+</robot>

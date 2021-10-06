@@ -1,0 +1,2005 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="chassis">
+  <!-- Base Properties -->
+  <xacro:property name="mass_base" value="50" />
+  <xacro:property name="base_x_size" value="1.0" />
+  <xacro:property name="base_y_size" value="1.0" />
+  <xacro:property name="base_z_size" value="0.40" />
+
+  <xacro:arg name="gpu" default="true"/>
+  <xacro:property name="gpu" value="$(arg gpu)" />
+  <xacro:arg name="organize_cloud" default="false"/>
+  <xacro:property name="organize_cloud" value="$(arg organize_cloud)" />
+ 
+
+
+  <!--xacro:property name="com_base" value="25" />
+  <xacro:property name="com_x_size" value="0.67" />
+  <xacro:property name="com_y_size" value="1.0" />
+  <xacro:property name="com_z_size" value="0.47" />
+  <xacro:property name="com_base" value="25" />
+  <xacro:property name="com_x_size" value="0.55" />
+  <xacro:property name="com_y_size" value="0.5" />
+  <xacro:property name="com_z_size" value="0.40" />
+
+  <xacro:property name="top_base" value="25" />
+  <xacro:property name="top_x_size" value="1.8" />
+  <xacro:property name="top_y_size" value="1.8" />
+  <xacro:property name="top_z_size" value="0.72" />
+  <xacro:property name="top_base" value="25" />
+  <xacro:property name="top_x_size" value="1.2" />
+  <xacro:property name="top_y_size" value="1.2" />
+  <xacro:property name="top_z_size" value="0.60" />
+
+  <xacro:property name="side_top" value="25" />
+  <xacro:property name="side_x_size" value="0.65" />
+  <xacro:property name="side_y_size" value="1.1" />
+  <xacro:property name="side_z_size" value="0.72" />
+  
+  <xacro:property name="side_top" value="25" />
+  <xacro:property name="side_x_size" value="0.60" />
+  <xacro:property name="side_y_size" value="0.6" />
+  <xacro:property name="side_z_size" value="0.60" /-->
+  <!--Distance between 2 wheels along Y axis-->
+  <xacro:property name="wheelbase" value="2.8" />
+  <!--distance between 2 wheels along X axis-->
+  <xacro:property name="track" value="1.9" />
+
+  <xacro:macro name="chassis">
+    <!-- Base footprint is on the ground under the robot -->
+    <link name="base_footprint"/>
+
+    <gazebo reference="base_link">
+      <material>Gazebo/Grey</material>
+    </gazebo>
+        <gazebo reference="cover">
+      <material>Gazebo/Red</material>
+    </gazebo>
+    <!-- Base link is the center of the robot's bottom plate -->
+    <link name="base_link">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <box size="${base_x_size} ${base_y_size} ${base_z_size}"/>
+        </geometry>
+        <material name="grey">
+          <color rgba="0.6 0.6 0.6 1"/>
+        </material>
+      </visual>
+      <collision>
+        <geometry>
+          <box size="${base_x_size} ${base_y_size} ${base_z_size}"/>
+        </geometry>
+      </collision>
+    </link>
+    <joint name="base_footprint_joint" type="fixed">
+      <origin xyz="0 0 ${ground_clearance + base_z_size/2}" rpy="0 0 0" />
+      <child link="base_link" />
+      <parent link="base_footprint" />
+    </joint>
+
+    <!-- Interial link stores the robot's inertial information -->
+    <link name="inertial_link">
+      <inertial>
+        <mass value="340" />
+        <origin xyz="0 0 0" />
+        <inertia ixx="${mass_base/12.0 * (base_y_size*base_y_size + base_z_size*base_z_size)}" ixy="0" ixz="0"
+                 iyy="${mass_base/12.0 * (base_x_size*base_x_size + base_z_size*base_z_size)}" iyz="0"
+                 izz="${mass_base/12.0 * (base_y_size*base_y_size + base_x_size*base_x_size)}" />
+      </inertial>
+    </link>
+
+    <joint name="inertial_joint" type="fixed">
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <parent link="base_link" />
+      <child link="inertial_link" />
+    </joint>
+
+
+    <!--link name="complet_link">
+      <inertial>
+        <mass value="25" />
+        <origin xyz="0 0 0" />
+        <inertia ixx="${com_base/12.0 * (com_y_size*com_y_size + com_z_size*com_z_size)}" ixy="0" ixz="0"
+                 iyy="${com_base/12.0 * (com_x_size*com_x_size + com_z_size*com_z_size)}" iyz="0"
+                 izz="${com_base/12.0 * (com_y_size*com_y_size + com_x_size*com_x_size)}" />
+      </inertial>
+      <visual name="">
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+        <geometry>
+          <box size="${com_x_size} ${com_y_size} ${com_z_size}"/>
+        </geometry>
+        <material name="">
+          <color rgba="1.0 0.0 0.0 1.0"/>
+          <texture filename=""/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+        <geometry>
+          <box size="${com_x_size} ${com_y_size} ${com_z_size}"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <joint name="complet_joint" type="fixed">
+      <origin xyz="-1.21 0.0 0.0" rpy="0.0 0.0 0.0"/>
+      <parent link="base_link"/>
+      <child link="complet_link"/>
+      <axis xyz="0.0 0.0 0.0"/>
+      <limit lower="0.0" upper="0.0" effort="0.0" velocity="0.0"/>
+    </joint>
+
+        <link name="complet1_link">
+      <inertial>
+        <mass value="25" />
+        <origin xyz="0 0 0" />
+        <inertia ixx="${com_base/12.0 * (com_y_size*com_y_size + com_z_size*com_z_size)}" ixy="0" ixz="0"
+                 iyy="${com_base/12.0 * (com_x_size*com_x_size + com_z_size*com_z_size)}" iyz="0"
+                 izz="${com_base/12.0 * (com_y_size*com_y_size + com_x_size*com_x_size)}" />
+      </inertial>
+      <visual name="">
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+        <geometry>
+          <box size="${com_x_size} ${com_y_size} ${com_z_size}"/>
+        </geometry>
+        <material name="">
+          <color rgba="1.0 0.0 0.0 1.0"/>
+          <texture filename=""/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+        <geometry>
+          <box size="${com_x_size} ${com_y_size} ${com_z_size}"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <joint name="complet1_joint" type="fixed">
+      <origin xyz="1.21 0.0 0.0" rpy="0.0 0.0 0.0"/>
+      <parent link="base_link"/>
+      <child link="complet1_link"/>
+      <axis xyz="0.0 0.0 0.0"/>
+      <limit lower="0.0" upper="0.0" effort="0.0" velocity="0.0"/>
+    </joint>
+
+
+    <link name="top_link">
+      <inertial>
+   
+        <mass value="25" />
+        <origin xyz="0 0 0" />
+        <inertia ixx="${top_base/12.0 * (top_y_size*top_y_size + top_z_size*top_z_size)}" ixy="0" ixz="0"
+                 iyy="${top_base/12.0 * (top_x_size*top_x_size + top_z_size*top_z_size)}" iyz="0"
+                 izz="${top_base/12.0 * (top_y_size*top_y_size + top_x_size*top_x_size)}" />
+      </inertial>
+      <visual name="">
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+        <geometry>
+          <box size="${top_x_size} ${top_y_size} ${top_z_size}"/>
+        </geometry>
+        <material name="">
+          <color rgba="1.0 0.0 0.0 1.0"/>
+          <texture filename=""/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+        <geometry>
+          <box size="${top_x_size} ${top_y_size} ${top_z_size}"/>
+        </geometry>
+      </collision>
+    </link>
+    <joint name="top_joint" type="fixed">
+      <origin xyz="0.0 0.0 0.6" rpy="0.0 0.0 0.0"/>
+      <parent link="base_link"/>
+      <child link="top_link"/>
+      <axis xyz="0.0 0.0 0.0"/>
+      <limit lower="0.0" upper="0.0" effort="0.0" velocity="0.0"/>
+    </joint>
+
+    <link name="side_link">
+      <inertial>
+        <mass value="25" />
+        <origin xyz="0 0 0" />
+        <inertia ixx="${side_top/12.0 * (side_y_size*side_y_size + side_z_size*side_z_size)}" ixy="0" ixz="0"
+                 iyy="${side_top/12.0 * (side_x_size*side_x_size + side_z_size*side_z_size)}" iyz="0"
+                 izz="${side_top/12.0 * (side_y_size*side_y_size + side_x_size*side_x_size)}" />
+      </inertial>
+      <visual name="">
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+        <geometry>
+          <box size="${side_x_size} ${side_y_size} ${side_z_size}"/>
+        </geometry>
+        <material name="">
+          <color rgba="1.0 0.0 0.0 1.0"/>
+          <texture filename=""/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+        <geometry>
+          <box size="${side_x_size} ${side_y_size} ${side_z_size}"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <joint name="side_joint" type="fixed">
+      <origin xyz="-1.21 0.0 0.6" rpy="0.0 0.0 0.0"/>
+      <parent link="base_link"/>
+      <child link="side_link"/>
+      <axis xyz="0.0 0.0 0.0"/>
+      <limit lower="0.0" upper="0.0" effort="0.0" velocity="0.0"/>
+    </joint>
+
+    <link name="side1_link">
+      <inertial>
+        <mass value="25" />
+        <origin xyz="0 0 0" />
+        <inertia ixx="${side_top/12.0 * (side_y_size*side_y_size + side_z_size*side_z_size)}" ixy="0" ixz="0"
+                 iyy="${side_top/12.0 * (side_x_size*side_x_size + side_z_size*side_z_size)}" iyz="0"
+                 izz="${side_top/12.0 * (side_y_size*side_y_size + side_x_size*side_x_size)}" />
+      </inertial>
+      <visual name="">
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+        <geometry>
+          <box size="${side_x_size} ${side_y_size} ${side_z_size}"/>
+        </geometry>
+        <material name="">
+          <color rgba="1.0 0.0 0.0 1.0"/>
+          <texture filename=""/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+        <geometry>
+          <box size="${side_x_size} ${side_y_size} ${side_z_size}"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <joint name="side1_joint" type="fixed">
+      <origin xyz="1.21 0.0 0.6" rpy="0.0 0.0 0.0"/>
+      <parent link="base_link"/>
+      <child link="side1_link"/>
+      <axis xyz="0.0 0.0 0.0"/>
+      <limit lower="0.0" upper="0.0" effort="0.0" velocity="0.0"/>
+    </joint-->
+  
+  
+  <link
+    name="cover">
+    <inertial>
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+      <mass
+        value="100.38" />
+      <inertia
+        ixx="68.516"
+        ixy="-2.1784"
+        ixz="6.7594"
+        iyy="357.45"
+        iyz="0.25495"
+        izz="375.18" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/cover.STL" />
+      </geometry>
+	<material name="silver">
+		<color rgba="0.700 0.700 0.700 1.000"/>
+	</material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/cover.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="cover_joint" type="fixed">
+   <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+    <child link="cover" />
+    <parent link="base_link" />
+    </joint>  
+    
+  <!-- Lidar -->
+  <!--xacro:include filename="$(find velodyne_description)/urdf/VLP-16.urdf.xacro"/>
+  <xacro:VLP-16 parent="cover" name="velodyne1" topic="points2" organize_cloud="${organize_cloud}" hz="10" samples="440" gpu="${gpu}">
+    <origin
+      xyz="1.6 0 0.87"
+      rpy="0 0.506145 0" />
+  </xacro:VLP-16-->  
+  
+  <xacro:include filename="$(find velodyne_description)/urdf/VLP-16.urdf.xacro"/>
+  <xacro:VLP-16 parent="base_link" name="velodyne1" topic="points2" organize_cloud="${organize_cloud}" hz="10" samples="1875" gpu="${gpu}">
+    <origin
+      xyz="-0.04298 0 1.375"
+      rpy="0 0 1.5708" />
+  </xacro:VLP-16>     
+  
+  
+  <!--link
+    name="VLP-16">
+    <inertial>
+      <origin
+        xyz="13.124 0.036373 -8.8392E-14"
+        rpy="0 0 0" />
+      <mass
+        value="0.84" />
+      <inertia
+        ixx="1"
+        ixy="0"
+        ixz="0"
+        iyy="1"
+        iyz="0"
+        izz="0" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/Front_Velodyne_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/Front_Velodyne_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="VLP-16"
+    type="fixed">
+    <origin
+      xyz="1.6 0 0.87"
+      rpy="1.5708 0.50615 0" />
+    <parent
+      link="cover" />
+    <child
+      link="Front_Velodyne_Link" />
+    <axis
+      xyz="0 0 0" />
+  </joint-->
+  
+  
+  <!--link
+    name="Center_Velodyne_Link">
+    <inertial>
+      <origin
+        xyz="-3.2964E-14 0.037148 -2.5618E-14"
+        rpy="0 0 0" />
+      <mass
+        value="0.84" />
+      <inertia
+        ixx="1"
+        ixy="0"
+        ixz="0"
+        iyy="1"
+        iyz="0"
+        izz="1" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/Center_Velodyne_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/Center_Velodyne_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Center_Velodyne_Joint"
+    type="fixed">
+    <origin
+      xyz="-0.04298 0 1.375"
+      rpy="1.5708 0 1.5708" />
+    <parent
+      link="cover" />
+    <child
+      link="Center_Velodyne_Link" />
+    <axis
+      xyz="0 0 0" />
+  </joint-->
+    
+
+      
+<!-- Front Ultrasonic -->
+<!--xacro:sonar_sensor update_rate="10" name="s0" ros_topic="s0" min_range="0.100000" ray_count="1" field_of_view="0.267000" parent="cover" max_range="3">
+    <origin  rpy="0 0 0"              xyz="1.7208 -0.3 0.03" />
+ </xacro:sonar_sensor-->
+ 
+ <!--xacro:sonar_sensor update_rate="10" name="s1" ros_topic="s1" min_range="0.100000" ray_count="1" field_of_view="0.267000" parent="cover" max_range="3">
+    <origin  rpy="0 0 0"         xyz="1.7208 0.3 0.03" />
+ </xacro:sonar_sensor>
+ 
+ <xacro:sonar_sensor update_rate="10" name="s2" ros_topic="s2" min_range="0.100000" ray_count="1" field_of_view="0.267000" parent="cover" max_range="3">
+    <origin  rpy="0 0 0"           xyz="1.7208 0 0.03" />
+ </xacro:sonar_sensor-->
+ 
+<!-- Rear Ultasonic -->
+ <!--xacro:sonar_sensor update_rate="10" name="s3" ros_topic="s3" min_range="0.100000" ray_count="1" field_of_view="0.267000" parent="cover" max_range="3">
+     <origin          xyz="-1.5275 -0.23 -0.02" rpy="0 -3.14159 0" />
+ </xacro:sonar_sensor>
+ 
+ <xacro:sonar_sensor update_rate="10" name="s4" ros_topic="s4" min_range="0.100000" ray_count="1" field_of_view="0.267000" parent="cover" max_range="3">
+<origin       xyz="-1.5275 0.23 -0.02" rpy="0 -3.14159 0" />
+ </xacro:sonar_sensor>
+ 
+ <xacro:sonar_sensor update_rate="10" name="s5" ros_topic="s5" min_range="0.100000" ray_count="1" field_of_view="0.267000" parent="cover" max_range="3">
+<origin        xyz="-1.5275 0 -0.02"       rpy="0 -3.14159 0"  />
+ </xacro:sonar_sensor-->
+ 
+<!-- Right Ultrasonic -->
+ <!--xacro:sonar_sensor update_rate="10" name="s6" ros_topic="s6" min_range="0.100000" ray_count="1" field_of_view="0.267000" parent="cover" max_range="3">
+<origin         xyz="0.8 -0.9063 0.33" rpy="0 0 -1.570796"/>
+ </xacro:sonar_sensor>
+ 
+ <xacro:sonar_sensor update_rate="10" name="s7" ros_topic="s7" min_range="0.100000" ray_count="1" field_of_view="0.267000" parent="cover" max_range="3">
+<origin        xyz="-0.18 -0.9063 0.33" rpy="0 0 -1.570796"/>
+ </xacro:sonar_sensor>
+
+ <xacro:sonar_sensor update_rate="10" name="s8" ros_topic="s8" min_range="0.100000" ray_count="1" field_of_view="0.267000" parent="cover" max_range="3">
+<origin          xyz="0.31 -0.9063 0.33" rpy="0 0 -1.570796"/>
+ </xacro:sonar_sensor-->
+  
+<!-- Left Ultrasonic -->
+ <!--xacro:sonar_sensor update_rate="10" name="s9" ros_topic="s9" min_range="0.100000" ray_count="1" field_of_view="0.267000" parent="cover" max_range="3">
+<origin          xyz="0.8 0.9063 0.33" rpy="0 0 1.570796"/>
+ </xacro:sonar_sensor>
+
+ <xacro:sonar_sensor update_rate="10" name="s10" ros_topic="s10" min_range="0.100000" ray_count="1" field_of_view="0.267000" parent="cover" max_range="3">
+<origin         xyz="-0.18 0.9063 0.33"  rpy="0 0 1.570796"/>
+ </xacro:sonar_sensor>  
+
+
+ <xacro:sonar_sensor update_rate="10" name="s11" ros_topic="s11" min_range="0.100000" ray_count="1" field_of_view="0.267000" parent="cover" max_range="3">
+<origin          xyz="0.31 0.9063 0.33" rpy="0 0 1.570796"/>
+ </xacro:sonar_sensor--> 
+
+
+
+
+    
+    
+    
+    
+  <!--link
+    name="FR_WideCamera_Link">
+    <inertial>
+      <origin
+        xyz="-2.22044604925031E-16 0 0.00032423510258961"
+        rpy="0 0 0" />
+      <mass
+        value="0.00583259571459405" />
+      <inertia
+        ixx="1"
+        ixy="0"
+        ixz="0"
+        iyy="1"
+        iyz="0"
+        izz="1" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/FR_WideCamera_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/FR_WideCamera_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="FR_WideCamera_Joint"
+    type="fixed">
+    <origin
+      xyz="1.1289 -0.81832 0.81762"
+      rpy="0 0 0" />
+    <parent
+      link="cover" />
+    <child
+      link="FR_WideCamera_Link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+
+
+  <link
+    name="FL_WideCamera_Link">
+    <inertial>
+      <origin
+        xyz="1.11022302462516E-16 0 0.00032423510258961"
+        rpy="0 0 0" />
+      <mass
+        value="0.00583259571459411" />
+      <inertia
+        ixx="1"
+        ixy="0"
+        ixz="0"
+        iyy="1"
+        iyz="0"
+        izz="1" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/FL_WideCamera_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/FL_WideCamera_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="FL_WideCamera_Joint"
+    type="fixed">
+    <origin
+      xyz="1.1289 0.81832 0.81762"
+      rpy="1.5708 0 -0.39349" />
+    <parent
+      link="cover" />
+    <child
+      link="FL_WideCamera_Link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+
+  <link
+    name="FC_WideCamera_Link">
+    <inertial>
+      <origin
+        xyz="-6.8514061814894E-18 0 -0.000324235102589387"
+        rpy="0 0 0" />
+      <mass
+        value="0.00583259571459396" />
+      <inertia
+        ixx="1"
+        ixy="0"
+        ixz="0"
+        iyy="1"
+        iyz="0"
+        izz="1" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/FC_WideCamera_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/FC_WideCamera_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="FC_WideCamera_Joint"
+    type="fixed">
+    <origin
+      xyz="1.6429 0 0.81762"
+      rpy="0 0 0" />
+    <parent
+      link="cover" />
+    <child
+      link="FC_WideCamera_Link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+
+  <link
+    name="RR_WideCamera_Link">
+    <inertial>
+      <origin
+        xyz="-2.2204E-16 0 0.00032424"
+        rpy="0 0 0" />
+      <mass
+        value="0.0058326" />
+      <inertia
+        ixx="1"
+        ixy="0"
+        ixz="0"
+        iyy="1"
+        iyz="0"
+        izz="1" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/RR_WideCamera_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/RR_WideCamera_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="RR_WideCamera_Joint"
+    type="fixed">
+    <origin
+      xyz="-1.2113 -0.79564 0.943"
+      rpy="1.5708 0 2.8028" />
+    <parent
+      link="cover" />
+    <child
+      link="RR_WideCamera_Link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+
+  <link
+    name="RL_WideCamera_Link">
+    <inertial>
+      <origin
+        xyz="1.1102E-16 -1.1102E-16 0.00032424"
+        rpy="0 0 0" />
+      <mass
+        value="0.0058326" />
+      <inertia
+        ixx="1"
+        ixy="0"
+        ixz="0"
+        iyy="1"
+        iyz="0"
+        izz="1" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/RL_WideCamera_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/RL_WideCamera_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="RL_WideCamera_Joint"
+    type="fixed">
+    <origin
+      xyz="-1.2113 0.79564 0.943"
+      rpy="1.5708 0 0.33876" />
+    <parent
+      link="cover" />
+    <child
+      link="RL_WideCamera_Link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+
+  <link
+    name="RC_WideCamera_Link">
+    <inertial>
+      <origin
+        xyz="-1.8575E-16 -1.1102E-16 0.00032424"
+        rpy="0 0 0" />
+      <mass
+        value="0.0058326" />
+      <inertia
+        ixx="1"
+        ixy="0"
+        ixz="0"
+        iyy="1"
+        iyz="0"
+        izz="1" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/RC_WideCamera_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/RC_WideCamera_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="RC_WideCamera_Joint"
+    type="fixed">
+    <origin
+      xyz="-1.483 0 0.943"
+      rpy="0 0 0" />
+    <parent
+      link="cover" />
+    <child
+      link="RC_WideCamera_Link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>    
+    
+    
+    
+    
+<xacro:garmin_sensor update_rate="10" name="garmin1" ros_topic="micropolis/garmin1" min_range="0.100000" ray_count="1" field_of_view="0.267000" parent="cover" max_range="3">
+    <origin
+      xyz="1.4613 -0.61384 0.91446"
+      rpy="4.01426 3.14159 1.434137" />
+ </xacro:garmin_sensor>    
+    
+    
+  <link
+    name="FR_Garmin_Link">
+    <inertial>
+      <origin
+        xyz="-0.047195 0.0073974 -0.00071007"
+        rpy="0 0 0" />
+      <mass
+        value="0.022858" />
+      <inertia
+        ixx="1"
+        ixy="0"
+        ixz="0"
+        iyy="1"
+        iyz="0"
+        izz="1" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/FR_Garmin_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/FR_Garmin_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="FR_Garmin_Joint"
+    type="fixed">
+    <origin
+      xyz="1.4613 -0.61384 0.91446"
+      rpy="-2.4429 -0.035461 -1.7417" />
+    <parent
+      link="cover" />
+    <child
+      link="FR_Garmin_Link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="FL_Garmin_Link">
+    <inertial>
+      <origin
+        xyz="-0.0471945596975736 0.00739736892348697 0.000710067564142269"
+        rpy="0 0 0" />
+      <mass
+        value="0.0228576292432645" />
+      <inertia
+        ixx="1"
+        ixy="0"
+        ixz="0"
+        iyy="1"
+        iyz="0"
+        izz="1" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/FL_Garmin_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.796078431372549 0.823529411764706 0.937254901960784 0.2" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/FL_Garmin_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="FL_Garmin_Joint"
+    type="fixed">
+    <origin
+      xyz="1.4613 0.61384 0.91446"
+      rpy="-0.69866 -0.035461 1.7417" />
+    <parent
+      link="cover" />
+    <child
+      link="FL_Garmin_Link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="FC_Garmin_Link">
+    <inertial>
+      <origin
+        xyz="-0.047195 0.0073974 -0.00071007"
+        rpy="0 0 0" />
+      <mass
+        value="0.022858" />
+      <inertia
+        ixx="1"
+        ixy="0"
+        ixz="0"
+        iyy="1"
+        iyz="0"
+        izz="1" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/FC_Garmin_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/FC_Garmin_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="FC_Garmin_Joint"
+    type="fixed">
+    <origin
+      xyz="1.48 -0.045164 0.72756"
+      rpy="-2.5307 0 -1.5708" />
+    <parent
+      link="cover" />
+    <child
+      link="FC_Garmin_Link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="RR_Garmin_Link">
+    <inertial>
+      <origin
+        xyz="-0.0471945399384698 0.00739735518253881 -0.000710068204558878"
+        rpy="0 0 0" />
+      <mass
+        value="0.0228576296151502" />
+      <inertia
+        ixx="1"
+        ixy="0"
+        ixz="0"
+        iyy="1"
+        iyz="0"
+        izz="1" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/RR_Garmin_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/RR_Garmin_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="RR_Garmin_Link"
+    type="fixed">
+    <origin
+      xyz="-1.3643 -0.60416 0.80931"
+      rpy="-2.3743 0.05498 1.6237" />
+    <parent
+      link="cover" />
+    <child
+      link="RR_Garmin_Link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="RL_Garmin_Link">
+    <inertial>
+      <origin
+        xyz="-0.0471945391054129 0.00739735531606867 -0.000710068258405583"
+        rpy="0 0 0" />
+      <mass
+        value="0.0228576283122481" />
+      <inertia
+        ixx="1"
+        ixy="0"
+        ixz="0"
+        iyy="1"
+        iyz="0"
+        izz="1" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/RL_Garmin_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/RL_Garmin_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="RL_Garmin_Joint"
+    type="fixed">
+    <origin
+      xyz="-1.4445 0.045164 0.83499"
+      rpy="-2.7576 0 1.5708" />
+    <parent
+      link="cover" />
+    <child
+      link="RL_Garmin_Link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="RC_Garmin_Link">
+    <inertial>
+      <origin
+        xyz="-0.047194539942279 0.00739735526716068 -0.000710068276487508"
+        rpy="0 0 0" />
+      <mass
+        value="0.0228576294650546" />
+      <inertia
+        ixx="1"
+        ixy="0"
+        ixz="0"
+        iyy="1"
+        iyz="0"
+        izz="1" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/RC_Garmin_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/RC_Garmin_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="RC_Garmin_Joint"
+    type="fixed">
+    <origin
+      xyz="-1.3537 0.60416 0.79912"
+      rpy="2.3743 0.05498 -1.6237" />
+    <parent
+      link="cover" />
+    <child
+      link="RC_Garmin_Link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>    
+    
+    
+    
+    
+    
+    
+  <link
+    name="RLT_SpotRadar_Link">
+    <inertial>
+      <origin
+        xyz="0 0 0.0100860093217865"
+        rpy="0 0 0" />
+      <mass
+        value="0.0606133307611753" />
+      <inertia
+        ixx="1"
+        ixy="0"
+        ixz="0"
+        iyy="1"
+        iyz="0"
+        izz="1" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/RLT_SpotRadar_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/RLT_SpotRadar_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="RLT_SpotRadar_Joint"
+    type="fixed">
+    <origin
+      xyz="-1.2091 0.3 0.59"
+      rpy="-1.5708 0 -1.5708" />
+    <parent
+      link="cover" />
+    <child
+      link="RLT_SpotRadar_Link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="RLB_SpotRadar_Link">
+    <inertial>
+      <origin
+        xyz="0 0 -0.010086"
+        rpy="0 0 0" />
+      <mass
+        value="0.060613" />
+      <inertia
+        ixx="1"
+        ixy="0"
+        ixz="0"
+        iyy="1"
+        iyz="0"
+        izz="1" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/RLB_SpotRadar_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/RLB_SpotRadar_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="RLB_SpotRadar_Joint"
+    type="fixed">
+    <origin
+      xyz="-1.5215 0.26 0.02528"
+      rpy="-1.5708 0 1.5708" />
+    <parent
+      link="cover" />
+    <child
+      link="RLB_SpotRadar_Link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="RRT_SpotRadar_Link">
+    <inertial>
+      <origin
+        xyz="5.55111512312578E-17 0 -0.0100860093217865"
+        rpy="0 0 0" />
+      <mass
+        value="0.0606133307611754" />
+      <inertia
+        ixx="1"
+        ixy="0"
+        ixz="0"
+        iyy="1"
+        iyz="0"
+        izz="1" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/RRT_SpotRadar_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/RRT_SpotRadar_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="RRT_SpotRadar_Joint"
+    type="fixed">
+    <origin
+      xyz="-1.2091 -0.3 0.59"
+      rpy="-1.5708 0 1.5708" />
+    <parent
+      link="cover" />
+    <child
+      link="RRT_SpotRadar_Link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="RRB_SpotRadar_Link">
+    <inertial>
+      <origin
+        xyz="0 -6.93889390390723E-18 0.0100860093217865"
+        rpy="0 0 0" />
+      <mass
+        value="0.0606133307611753" />
+      <inertia
+        ixx="1"
+        ixy="0"
+        ixz="0"
+        iyy="1"
+        iyz="0"
+        izz="1" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/RRB_SpotRadar_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/RRB_SpotRadar_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="RRB_SpotRadar_Joint"
+    type="fixed">
+    <origin
+      xyz="-1.5215 -0.26 0.02528"
+      rpy="-1.5708 0 -1.5708" />
+    <parent
+      link="cover" />
+    <child
+      link="RRB_SpotRadar_Link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="FLT_SpotRadar_Link">
+    <inertial>
+      <origin
+        xyz="-6.10622663543836E-16 -2.33146835171283E-14 -0.0100860093217785"
+        rpy="0 0 0" />
+      <mass
+        value="0.0606133307611753" />
+      <inertia
+        ixx="1"
+        ixy="0"
+        ixz="0"
+        iyy="1"
+        iyz="0"
+        izz="1" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/FLT_SpotRadar_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/FLT_SpotRadar_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="FLT_SpotRadar_Joint"
+    type="fixed">
+    <origin
+      xyz="1.3535 0.25 0.52685"
+      rpy="1.5708 0 1.5708" />
+    <parent
+      link="cover" />
+    <child
+      link="FLT_SpotRadar_Link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="FRB_SpotRadar_Link">
+    <inertial>
+      <origin
+        xyz="-5.55111512312578E-17 2.77555756156289E-17 -0.0100860093217863"
+        rpy="0 0 0" />
+      <mass
+        value="0.0606133307611753" />
+      <inertia
+        ixx="1"
+        ixy="0"
+        ixz="0"
+        iyy="1"
+        iyz="0"
+        izz="1" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/FRB_SpotRadar_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/FRB_SpotRadar_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="FRB_SpotRadar_Joint"
+    type="fixed">
+    <origin
+      xyz="1.7195 -0.3 0.096599"
+      rpy="1.5708 0 1.5708" />
+    <parent
+      link="cover" />
+    <child
+      link="FRB_SpotRadar_Link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="FRT_SpotRadar_Link">
+    <inertial>
+      <origin
+        xyz="0 1.1102E-16 -0.010086"
+        rpy="0 0 0" />
+      <mass
+        value="0.060613" />
+      <inertia
+        ixx="1"
+        ixy="0"
+        ixz="0"
+        iyy="1"
+        iyz="0"
+        izz="1" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/FRT_SpotRadar_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/FRT_SpotRadar_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="FRT_SpotRadar_Joint"
+    type="fixed">
+    <origin
+      xyz="1.3535 -0.25 0.52685"
+      rpy="1.5708 0 1.5708" />
+    <parent
+      link="cover" />
+    <child
+      link="FRT_SpotRadar_Link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="FLB_SpotRadar_Link">
+    <inertial>
+      <origin
+        xyz="-5.5511E-17 2.7756E-17 0.010086"
+        rpy="0 0 0" />
+      <mass
+        value="0.060613" />
+      <inertia
+        ixx="1"
+        ixy="0"
+        ixz="0"
+        iyy="1"
+        iyz="0"
+        izz="1" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/FLB_SpotRadar_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/FLB_SpotRadar_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="FLB_SpotRadar_Joint"
+    type="fixed">
+    <origin
+      xyz="1.7195 0.3 0.096599"
+      rpy="1.5708 0 -1.5708" />
+    <parent
+      link="cover" />
+    <child
+      link="FLB_SpotRadar_Link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>    
+    
+    
+    
+    
+    
+    
+    
+    
+  <link
+    name="FR_UMR_Link">
+    <inertial>
+      <origin
+        xyz="0.0018024 -0.00045579 -0.0080911"
+        rpy="0 0 0" />
+      <mass
+        value="0.092541" />
+      <inertia
+        ixx="1"
+        ixy="0"
+        ixz="0"
+        iyy="1"
+        iyz="0"
+        izz="1" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/FR_UMR_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/FR_UMR_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="FR_UMR_Joint"
+    type="fixed">
+    <origin
+      xyz="1.15 -0.83 0.615"
+      rpy="-1.5708 0 -0.2618" />
+    <parent
+      link="cover" />
+    <child
+      link="FR_UMR_Link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="FL_UMR_Link">
+    <inertial>
+      <origin
+        xyz="0.0018024 -0.00045579 0.0080911"
+        rpy="0 0 0" />
+      <mass
+        value="0.092541" />
+      <inertia
+        ixx="1"
+        ixy="0"
+        ixz="0"
+        iyy="1"
+        iyz="0"
+        izz="1" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/FL_UMR_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/FL_UMR_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="FL_UMR_Joint"
+    type="fixed">
+    <origin
+      xyz="1.15 0.83 0.615"
+      rpy="-1.5708 0 0.2618" />
+    <parent
+      link="cover" />
+    <child
+      link="FL_UMR_Link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="FC_UMR_Link">
+    <inertial>
+      <origin
+        xyz="0.00180239022310377 0.000455788656476219 -0.00809111144067343"
+        rpy="0 0 0" />
+      <mass
+        value="0.0925411687551966" />
+      <inertia
+        ixx="1"
+        ixy="0"
+        ixz="0"
+        iyy="1"
+        iyz="0"
+        izz="1" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/FC_UMR_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/FC_UMR_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="FC_UMR_Joint"
+    type="fixed">
+    <origin
+      xyz="1.42 0 0.54798"
+      rpy="1.5708 0 -1.5708" />
+    <parent
+      link="cover" />
+    <child
+      link="FC_UMR_Link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="RR_UMR_Link">
+    <inertial>
+      <origin
+        xyz="0.0018024 -0.00045579 0.0080911"
+        rpy="0 0 0" />
+      <mass
+        value="0.092541" />
+      <inertia
+        ixx="1"
+        ixy="0"
+        ixz="0"
+        iyy="1"
+        iyz="0"
+        izz="1" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/RR_UMR_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/RR_UMR_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="RR_UMR_Joint"
+    type="fixed">
+    <origin
+      xyz="-1.207 -0.45225 0.59"
+      rpy="1.5708 0 -0.95993" />
+    <parent
+      link="cover" />
+    <child
+      link="RR_UMR_Link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="RL_UMR_Link">
+    <inertial>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <mass
+        value="0" />
+      <inertia
+        ixx="1"
+        ixy="0"
+        ixz="0"
+        iyy="1"
+        iyz="0"
+        izz="1" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/RL_UMR_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://four_wheel_steering_controller/test/meshes/RL_UMR_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="RL_UMR_Joint"
+    type="fixed">
+    <origin
+      xyz="-1.20701561475626 0.45225135145069 0.59"
+      rpy="-1.5707963267949 0 0.959931088596874" />
+    <parent
+      link="cover" />
+    <child
+      link="RL_UMR_Link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>    
+    
+    
+<xacro:arg name = "camera_topics1" default="camera1" />
+<xacro:arg name = "camera_topics2" default="camera2" />
+<xacro:arg name = "camera_topics3" default="camera3" />
+<xacro:arg name = "camera_topics4" default="camera4" />
+<xacro:arg name = "camera_topics5" default="camera5" />
+<xacro:arg name = "camera_topics6" default="camera6" />  
+<xacro:arg name = "camera_topics7" default="camera7" />  
+<xacro:arg name = "camera_topics8" default="camera8" />  
+<xacro:arg name = "camera_topics9" default="camera9" />  
+<xacro:arg name = "camera_topics10" default="camera10" />  
+<xacro:arg name = "camera_topics11" default="camera11" />  
+<xacro:arg name = "camera_topics12" default="camera12" /-->  
+<!-- Front Center Camera -->   
+<!--sensor_d435i parent="cover" name = "$(arg camera_topics1)" use_nominal_extrinsics = "True">
+    <origin
+      xyz="1.4831 0 0.64"
+      rpy="0 0 0" />
+</sensor_d435i>
+<sensor_d435i parent="cover" name = "$(arg camera_topics2)" use_nominal_extrinsics = "True">
+    <origin
+      xyz="1.62 0 0.775"
+      rpy="0 0.436332 0" />
+</sensor_d435i-->
+<!-- Front Right Camera -->
+<!--sensor_d435i parent="cover" name = "$(arg camera_topics3)" use_nominal_extrinsics = "True">
+    <origin
+      xyz="1.4168 -0.66177 0.84"
+      rpy="0 0 -0.7592182" />
+</sensor_d435i>
+<sensor_d435i parent="cover" name = "$(arg camera_topics4)" use_nominal_extrinsics = "True">
+    <origin
+      xyz="1.4181 -0.66304 0.79374"
+      rpy="0 0.261799 -0.75922" />
+</sensor_d435i-->
+
+<!-- Rear camera -->
+<!--sensor_d435i parent="cover" name = "$(arg camera_topics5)" use_nominal_extrinsics = "True">
+    <origin
+      xyz="-1.4831 0 0.90878"
+      rpy="0 -3.14159 0" />
+</sensor_d435i>
+
+<sensor_d435i parent="cover" name = "$(arg camera_topics6)" use_nominal_extrinsics = "True">
+    <origin
+      xyz="-1.4755 0 0.85767"
+      rpy="0 -3.61283 0" />
+</sensor_d435i>
+
+<sensor_d435i parent="cover" name = "$(arg camera_topics7)" use_nominal_extrinsics = "True">
+    <origin
+      xyz="-1.4041 0.69929 0.90878"
+      rpy="0 0 2.3282692" />
+</sensor_d435i>
+
+<sensor_d435i parent="cover" name = "$(arg camera_topics8)" use_nominal_extrinsics = "True">
+    <origin
+      xyz="-1.39 0.68442 0.84789"
+      rpy="0 0.436  2.3282692" />
+</sensor_d435i>
+<sensor_d435i parent="cover" name = "$(arg camera_topics9)" use_nominal_extrinsics = "True">
+    <origin
+      xyz="1.4181 0.66304 0.79374"
+      rpy="0 0.261799 0.75922" />
+</sensor_d435i>
+
+
+
+<sensor_d435i parent="cover" name = "$(arg camera_topics10)" use_nominal_extrinsics = "True">
+    <origin
+      xyz="1.4168 0.66177 0.84"
+      rpy="0 0 0.7592182" />
+</sensor_d435i>
+
+<sensor_d435i parent="cover" name = "$(arg camera_topics11)" use_nominal_extrinsics = "True">
+    <origin
+      xyz="-1.4041 -0.69929 0.90878"
+      rpy="0 0 -2.3282692" />
+</sensor_d435i>
+
+<sensor_d435i parent="cover" name = "$(arg camera_topics12)" use_nominal_extrinsics = "True">
+    <origin
+      xyz="-1.39 -0.68442 0.84789"
+      rpy="0 0.436  -2.3282692" />
+</sensor_d435i-->
+
+        <xacro:property name="imu_size_x" value="0.004" />
+        <xacro:property name="imu_size_y" value="0.006" />
+        <xacro:property name="imu_size_z" value="0.001" />
+        <xacro:property name="imu_mass" value="0.00001" />
+        <xacro:property name="imu_offset_x" value="0.5" />
+        <xacro:property name="imu_offset_y" value="0.0" />
+        <xacro:property name="imu_offset_z" value="0.3" />
+
+        <link name="imu_link">
+            <inertial>
+                <origin xyz="0 0 0" rpy="0 0 0" />
+                <mass value="${imu_mass}" />
+                <inertia ixx="${imu_mass*(imu_size_y*imu_size_y+imu_size_z*imu_size_z)}" ixy="0" ixz="0"
+                         iyy="${imu_mass*(imu_size_x*imu_size_x+imu_size_z*imu_size_z)}" iyz="0"
+                         izz="${imu_mass*(imu_size_x*imu_size_x+imu_size_y*imu_size_y)}" />
+            </inertial>
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0" />
+                <geometry>
+                    <box size="${imu_size_x} ${imu_size_y} ${imu_size_z}" />
+                </geometry>
+
+            </visual>
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 0" />
+                <geometry>
+                    <box size="${imu_size_x} ${imu_size_y} ${imu_size_z}" />
+                </geometry>
+            </collision>
+        </link>
+        <joint name="imu_joint" type="fixed">
+            <parent link="base_link" />
+            <child link="imu_link" />
+            <origin rpy="0 0 0" xyz="${imu_offset_x} ${imu_offset_y} ${imu_offset_z}"/>
+        </joint>
+        <gazebo reference="imu_link">
+            <turnGravityOff>false</turnGravityOff>
+            <material>Gazebo/FlatBlack</material>
+        </gazebo>
+ 
+
+	    <gazebo reference="imu_link">
+		<gravity>true</gravity>
+		<sensor name="imu_sensor" type="imu">
+		    <always_on>true</always_on>
+		    <update_rate>100</update_rate>
+		    <visualize>true</visualize>
+		    <topic>/imu/data</topic>
+		    <plugin filename="libgazebo_ros_imu_sensor.so" name="imu_plugin">
+		        <topicName>/imu_data</topicName>
+		        <bodyName>imu_link</bodyName>
+		        <updateRateHZ>100.0</updateRateHZ>
+		        <gaussianNoise>0.0025</gaussianNoise>
+		        <xyzOffset>0 0 0</xyzOffset>
+		        <rpyOffset>0 0 0</rpyOffset>
+		        <frameName>imu_link</frameName>
+		    </plugin>
+		    <pose>0 0 0 0 0 0</pose>
+		</sensor>
+	    </gazebo>
+    
+  </xacro:macro>
+</robot>
